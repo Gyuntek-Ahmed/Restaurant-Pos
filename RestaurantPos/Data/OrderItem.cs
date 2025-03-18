@@ -1,0 +1,25 @@
+﻿using SQLite;
+
+namespace RestaurantPos.Data
+{
+    public class OrderItem
+    {
+        [PrimaryKey, AutoIncrement]
+        public long Id { get; set; }
+
+        public long OrderId { get; set; }
+
+        public int ItemId { get; set; }
+
+        public string Name { get; set; } = null!;
+
+        public string Icon { get; set; } = null!;
+
+        public decimal Price { get; set; }
+
+        public int Quantity { get; set; }
+
+        [Ignore]
+        public decimal Amount => Quantity * Price;
+    }
+}

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="RestaurantPos.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:RestaurantPos"
+    xmlns:pages="clr-namespace:RestaurantPos.Pages"
+    Title="Restaurant Pos"
+    Shell.FlyoutBackgroundColor="AliceBlue"
+    Shell.FlyoutBehavior="Locked"
+    Shell.FlyoutWidth="60">
+
+    <ShellContent
+        Title="Начало"
+        ContentTemplate="{DataTemplate pages:MainPage}"
+        Icon="home_regular_24.png"
+        Route="MainPage" />
+
+    <ShellContent
+        Title="Поръчки"
+        ContentTemplate="{DataTemplate pages:OrdersPage}"
+        Icon="list_ul_regular_24.png"
+        Route="OrdersPage" />
+
+    <ShellContent
+        Title="Управление"
+        ContentTemplate="{DataTemplate pages:ManageMenuItemPage}"
+        Icon="grid_alt_regular_24.png"
+        Route="ManageMenuItemPage" />
+
+    <Shell.FlyoutFooter>
+        <Image
+            Margin="0,0,0,25"
+            Aspect="AspectFill"
+            HeightRequest="20"
+            HorizontalOptions="Center"
+            Source="phone_regular_24.png"
+            WidthRequest="20" />
+    </Shell.FlyoutFooter>
+
+</Shell>
