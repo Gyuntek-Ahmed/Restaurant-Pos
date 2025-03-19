@@ -27,7 +27,8 @@ public static class MauiProgram
 		builder.Services
 			.AddSingleton<DatabaseService>()
 			.AddSingleton<HomeViewModel>()
-			.AddSingleton<MainPage>();
+			.AddSingleton<MainPage>()
+			.AddSingleton<OrdersViewModel>();
 
         return builder.Build();
 	}

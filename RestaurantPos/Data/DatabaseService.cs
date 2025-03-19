@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using RestaurantPos.Models;
+using SQLite;
 
 namespace RestaurantPos.Data
 {
@@ -55,7 +56,44 @@ WHERE mapping.MenuCategoryId = ?
 ";
 
             var menuItems = await connection.QueryAsync<MenuItem>(query, categoryId);
-            return [..menuItems];
+            return [.. menuItems];
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns>Returns Error Message or null (if the operation was successfull)</returns>
+        public async Task<string>? PlaceOrderAsync(OrderModel model)
+        {
+            var order = new Order
+            {
+                OrderDate = model.OrderDate,
+                PaymentMode = model.PaymentMode,
+                TotalAmountPaid = model.TotalAmountPaid,
+                TotalItemsCount = model.TotalItemsCount,
+            };
+
+            if (await connection.InsertAsync(order) > 0)
+            {
+                foreach (var item in model.Items)
+                {
+                    item.OrderId = order.Id;
+                }
+
+                if(await connection.InsertAllAsync(model.Items) == 0)
+                {
+                    await connection.DeleteAsync(order);
+                    return "Грешка при добавяне на елементи от поръчката";
+                }
+            }
+            else
+            {
+                return "Грешка при добавяне на поръчката";
+            }
+
+            model.Id = order.Id;
+            return null!;
         }
 
         public async ValueTask DisposeAsync()

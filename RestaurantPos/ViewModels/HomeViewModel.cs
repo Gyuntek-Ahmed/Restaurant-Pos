@@ -11,7 +11,7 @@ namespace RestaurantPos.ViewModels
     public partial class HomeViewModel : ObservableObject
     {
         private readonly DatabaseService databaseService;
-
+        private readonly OrdersViewModel ordersViewModel;
         [ObservableProperty]
         public MenuCategoryModel[] categories = [];
 
@@ -37,9 +37,10 @@ namespace RestaurantPos.ViewModels
         public decimal TaxAmount => (SubTotal * TaxPercentage) / 100;
         public decimal Total => SubTotal + TaxAmount;
 
-        public HomeViewModel(DatabaseService databaseService)
+        public HomeViewModel(DatabaseService databaseService, OrdersViewModel ordersViewModel)
         {
             this.databaseService = databaseService;
+            this.ordersViewModel = ordersViewModel;
             CartItems.CollectionChanged += CartItems_CollectionChanged;
         }
 
@@ -139,7 +140,12 @@ namespace RestaurantPos.ViewModels
         private void RemoveItemFromCart(CartModel cartItem) => CartItems.Remove(cartItem);
 
         [RelayCommand]
-        private void ClearCart() => CartItems.Clear();
+        private async Task ClearCartAsync()
+        {
+            if (await Shell.Current.DisplayAlert
+                ("Изчистване", "Желаете ли да премахнете всички продукти от кошницата?", "ДА", "НЕ"))
+                CartItems.Clear();
+        }
 
         private void RecalculateAmounts()
         {
@@ -165,7 +171,7 @@ namespace RestaurantPos.ViewModels
                     return;
                 }
 
-                if(enteredTaxPercentage > 100)
+                if (enteredTaxPercentage > 100)
                 {
                     await Shell.Current.DisplayAlert("Грешка", "Моля въведете данъчен процент по-малък от 100", "OK");
                     return;
@@ -179,6 +185,16 @@ namespace RestaurantPos.ViewModels
 
                 TaxPercentage = enteredTaxPercentage;
             }
+        }
+
+        [RelayCommand]
+        private async Task PlaceOrderAsync(bool isPaidOnline)
+        {
+            IsLoading = true;
+            if(await ordersViewModel.PlaceOrderAsync([.. CartItems], isPaidOnline))
+                CartItems.Clear();
+
+            IsLoading = false;
         }
     }
 }
