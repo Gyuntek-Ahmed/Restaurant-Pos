@@ -1,4 +1,5 @@
 ﻿using RestaurantPos.ViewModels;
+using MenuItem = RestaurantPos.Data.MenuItem;
 
 namespace RestaurantPos.Pages
 {
@@ -17,6 +18,16 @@ namespace RestaurantPos.Pages
         private async void Initialize()
         {
             await homeViewModel.InitializeAsync();
+        }
+
+        private async void CategoriesListControl_OnCategorySelected(Models.MenuCategoryModel category)
+        {
+            await homeViewModel.SelectCategoryCommand.ExecuteAsync(category);
+        }
+
+        private void MenuItemsListControl_OnSelectItem(MenuItem menuItem)
+        {
+            homeViewModel.AddToCartCommand.Execute(menuItem);
         }
     }
 }

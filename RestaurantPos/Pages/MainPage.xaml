@@ -24,7 +24,11 @@
             Padding="15">
             <!--<Label Grid.Row="0" Text="Здравейте" FontSize="22" FontAttributes="Bold" />-->
 
-            <CollectionView Grid.Row="1" ItemsSource="{Binding Categories}">
+            <controls:CategoriesListControl
+                Grid.Row="1"
+                Categories="{Binding Categories}"
+                OnCategorySelected="CategoriesListControl_OnCategorySelected"/>
+            <!--<CollectionView Grid.Row="1" ItemsSource="{Binding Categories}">
 
                 <CollectionView.ItemsLayout>
                     <LinearItemsLayout Orientation="Horizontal" ItemSpacing="10" />
@@ -75,10 +79,13 @@
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
-            </CollectionView>
+            </CollectionView>-->
 
             <Grid Grid.Row="2">
-                <CollectionView ItemsSource="{Binding MenuItems}">
+                <controls:MenuItemsListControl
+                    Items="{Binding MenuItems}"
+                    OnSelectItem="MenuItemsListControl_OnSelectItem"/>
+                <!--<CollectionView ItemsSource="{Binding MenuItems}">
                     <CollectionView.ItemsLayout>
                         <GridItemsLayout Orientation="Vertical"
                                          Span="4"
@@ -134,7 +141,7 @@
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
-                </CollectionView>
+                </CollectionView>-->
 
                 <BoxView IsVisible="{Binding IsLoading}"
                          HorizontalOptions="Fill"
