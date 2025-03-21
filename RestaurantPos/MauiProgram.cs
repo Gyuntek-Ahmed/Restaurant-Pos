@@ -29,7 +29,9 @@ public static class MauiProgram
 			.AddSingleton<HomeViewModel>()
 			.AddSingleton<MainPage>()
 			.AddSingleton<OrdersViewModel>()
-			.AddSingleton<OrdersPage>();
+			.AddSingleton<OrdersPage>()
+			.AddTransient<ManageMenuItemsViewModel>()
+			.AddTransient<ManageMenuItemPage>();
 
         return builder.Build();
 	}

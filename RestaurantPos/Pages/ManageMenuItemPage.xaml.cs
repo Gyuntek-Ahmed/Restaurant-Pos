@@ -1,9 +1,27 @@
+using RestaurantPos.ViewModels;
+using System.Threading.Tasks;
+
 namespace RestaurantPos.Pages;
 
 public partial class ManageMenuItemPage : ContentPage
 {
-	public ManageMenuItemPage()
-	{
+    private readonly ManageMenuItemsViewModel manageMenuItemsViewModel;
+
+    public ManageMenuItemPage(ManageMenuItemsViewModel manageMenuItemsViewModel)
+    {
 		InitializeComponent();
-	}
+        this.manageMenuItemsViewModel = manageMenuItemsViewModel;
+        BindingContext = manageMenuItemsViewModel;
+        InitializeAsync();
+    }
+
+    private async void InitializeAsync()
+        => await manageMenuItemsViewModel.InitializeAsync();
+    
+
+    private async void MenuItemsListControl_OnSelectItem(Data.MenuItem menuItem)
+        => await manageMenuItemsViewModel.EditMenuItemCommand.ExecuteAsync(menuItem);
+
+    private async void CategoriesListControl_OnCategorySelected(Models.MenuCategoryModel category)
+        => await manageMenuItemsViewModel.SelectCategoryCommand.ExecuteAsync(category);
 }

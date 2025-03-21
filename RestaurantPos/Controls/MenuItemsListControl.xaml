@@ -46,14 +46,15 @@
                                FontSize="25"
                                FontAttributes="Bold"
                                TextColor="Coral"/>
-                            <ImageButton Source="shopping_bag_regular_24.png"
-                                     CornerRadius="8"
-                                     BackgroundColor="AntiqueWhite"
-                                     HeightRequest="25"
-                                     WidthRequest="25"
-                                     Command="{Binding Source={x:RelativeSource AncestorType={x:Type controls:MenuItemsListControl}},
-                                     Path=SelectItemCommand}"
-                                     CommandParameter="{Binding .}"/>
+                            <ImageButton
+                                Source="{Binding Source={x:Reference this}, Path=ActionIcon}"
+                                CornerRadius="8"
+                                BackgroundColor="AntiqueWhite"
+                                HeightRequest="25"
+                                WidthRequest="25"
+                                Command="{Binding Source={x:RelativeSource AncestorType={x:Type controls:MenuItemsListControl}},
+                                Path=SelectItemCommand}"
+                                CommandParameter="{Binding .}"/>
                         </FlexLayout>
                     </VerticalStackLayout>
                     <Border.GestureRecognizers>
