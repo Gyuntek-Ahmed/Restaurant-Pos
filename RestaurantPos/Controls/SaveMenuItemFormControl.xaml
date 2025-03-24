@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="RestaurantPos.Controls.SaveMenuItemFormControl">
+             x:Class="RestaurantPos.Controls.SaveMenuItemFormControl"
+             xmlns:models="clr-namespace:RestaurantPos.Models"
+             xmlns:controls="clr-namespace:RestaurantPos.Controls"
+             xmlns:converters="clr-namespace:RestaurantPos.Converters"
+             x:Name="this">
 
     <ContentView.Resources>
         <ResourceDictionary>
@@ -14,14 +18,15 @@
                 <Setter Property="FontSize" Value="16" />
             </Style>
         </ResourceDictionary>
+        <converters:DecimalStringConverter x:Key="DecimalStringConverter" />
     </ContentView.Resources>
 
-    <ScrollView>
+    <ScrollView BindingContext="{x:Reference this}">
         <VerticalStackLayout Spacing="10">
             
             <VerticalStackLayout Spacing="2">
                 <Label Text="Име" Style="{StaticResource lbl}" />
-                <Entry Placeholder="Въведете Име" Style="{StaticResource txt}" />
+                <Entry Text="{Binding Item.Name}" Placeholder="Въведете Име" Style="{StaticResource txt}" Margin="0,0,15,0" />
             </VerticalStackLayout>
 
             <VerticalStackLayout Spacing="2">
@@ -34,6 +39,7 @@
                     VerticalOptions="Center"
                     StrokeThickness="0">
                     <Image
+                        x:Name="itemIcon"
                         Source="add_image.png"
                         HeightRequest="36"
                         WidthRequest="36"
@@ -47,21 +53,59 @@
                     HorizontalOptions="Center"
                     MinimumHeightRequest="30"
                     BackgroundColor="BlueViolet"
+                    Clicked="PickImageButton_Clicked"
                     Margin="0, 5, 0, 0"/>
             </VerticalStackLayout>
 
             <VerticalStackLayout Spacing="2">
                 <Label Text="Цена" Style="{StaticResource lbl}" />
-                <Entry Placeholder="Въведете Цена" Style="{StaticResource txt}" />
+                <Entry Text="{Binding Item.Price, Converter={StaticResource DecimalStringConverter}}" Placeholder="Въведете Цена" Style="{StaticResource txt}" Margin="0,0,15,0" />
             </VerticalStackLayout>
 
             <VerticalStackLayout Spacing="2">
                 <Label Text="Описание" Style="{StaticResource lbl}" />
-                <Entry Placeholder="Въведете Описание" Style="{StaticResource txt}" MinimumHeightRequest="100" />
+                <Editor
+                    Text="{Binding Item.Description}"
+                    Placeholder="Въведете Описание"
+                    Style="{StaticResource txt}"
+                    MinimumHeightRequest="100"
+                    Margin="0,0,15,0" />
             </VerticalStackLayout>
 
             <VerticalStackLayout Spacing="2">
                 <Label Text="Категории" Style="{StaticResource lbl}" />
+                <CollectionView ItemsSource="{Binding Item.Categories}">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="3" VerticalItemSpacing="3" HorizontalItemSpacing="3" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:MenuCategoryModel">
+                            <Border
+                                BackgroundColor="AntiqueWhite"
+                                StrokeShape="RoundRectangle 10"
+                                HeightRequest="45">
+                                <Label
+                                    Text="{Binding Name}"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center">
+                                </Label>
+                                <Border.Triggers>
+                                    <DataTrigger
+                                        TargetType="Border"
+                                        Binding="{Binding IsSelected}"
+                                        Value="True">
+                                        <Setter Property="BackgroundColor" Value="Aqua" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={x:RelativeSource AncestorType={x:Type controls:SaveMenuItemFormControl}},
+                                        Path=ToggleCategorySelectionCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
             </VerticalStackLayout>
 
             <Grid ColumnDefinitions="*, *">
@@ -70,11 +114,14 @@
                     Grid.Column="0"
                     BackgroundColor="Red"
                     HorizontalOptions="Start"
+                    Command="{Binding CancelCommand}"
                     Text="Отказ" />
 
                 <Button
                     Grid.Column="1"
+                    Margin="0,0,15,0"
                     BackgroundColor="ForestGreen"
+                    Command="{Binding SaveMenuItemCommand}"
                     Text="Запази" />
             </Grid>
 

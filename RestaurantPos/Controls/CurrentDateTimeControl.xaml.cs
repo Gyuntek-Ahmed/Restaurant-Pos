@@ -8,6 +8,7 @@ public partial class CurrentDateTimeControl : ContentView, IDisposable
 		InitializeComponent();
         String date = DateTime.Now.ToString("dddd, dd/MM/yyyy");
         dateLabel.Text = char.ToUpper(date[0]) + date.Substring(1);
+
         dayTimeLabel.Text = DateTime.Now.ToString("Текущо Време: HH:mm:ss");
 
         timer = new PeriodicTimer(TimeSpan.FromSeconds(1));

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using RestaurantPos.Data;
 using RestaurantPos.Models;
 using System.Collections.ObjectModel;
@@ -8,7 +9,7 @@ using MenuItem = RestaurantPos.Data.MenuItem;
 
 namespace RestaurantPos.ViewModels
 {
-    public partial class HomeViewModel : ObservableObject
+    public partial class HomeViewModel : ObservableObject, IRecipient<MenuItemChangeMessage>
     {
         private readonly DatabaseService databaseService;
         private readonly OrdersViewModel ordersViewModel;
@@ -42,6 +43,8 @@ namespace RestaurantPos.ViewModels
             this.databaseService = databaseService;
             this.ordersViewModel = ordersViewModel;
             CartItems.CollectionChanged += CartItems_CollectionChanged;
+
+            WeakReferenceMessenger.Default.Register<MenuItemChangeMessage>(this);
         }
 
         private void CartItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -195,6 +198,54 @@ namespace RestaurantPos.ViewModels
                 CartItems.Clear();
 
             IsLoading = false;
+        }
+
+        public void Receive(MenuItemChangeMessage message)
+        {
+            var model = message.Value;
+            var menuItem = MenuItems.FirstOrDefault(m => m.Id == model.Id);
+
+            if (menuItem != null)
+            {
+                if (!model.SelectedCategories.Any(c => c.Id == SelectedCategory!.Id))
+                {
+                    MenuItems = [.. MenuItems.Where(m => m.Id != model.Id)];
+                    return;
+                }
+
+                menuItem.Price = model.Price;
+                menuItem.Description = model.Description;
+                menuItem.Name = model.Name;
+                menuItem.Icon = model.Icon;
+
+                MenuItems = [.. MenuItems];
+            }
+            else if (model.SelectedCategories.Any(c => c.Id == SelectedCategory!.Id))
+            {
+                var newMenuItem = new MenuItem
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Icon = model.Icon,
+                    Description = model.Description,
+                    Price = model.Price
+                };
+
+                MenuItems = [.. MenuItems, newMenuItem];
+            }
+
+            var cartItem = CartItems.FirstOrDefault(c => c.ItemId == model.Id);
+
+            if (cartItem != null)
+            {
+                cartItem.Name = model.Name;
+                cartItem.Icon = model.Icon;
+                cartItem.Price = model.Price;
+
+                var itemIndex = CartItems.IndexOf(cartItem);
+
+                CartItems[itemIndex] = cartItem;
+            }
         }
     }
 }

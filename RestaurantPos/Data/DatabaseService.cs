@@ -81,7 +81,7 @@ WHERE mapping.MenuCategoryId = ?
                     item.OrderId = order.Id;
                 }
 
-                if(await connection.InsertAllAsync(model.Items) == 0)
+                if (await connection.InsertAllAsync(model.Items) == 0)
                 {
                     await connection.DeleteAsync(order);
                     return "Грешка при добавяне на елементи от поръчката";
@@ -101,6 +101,101 @@ WHERE mapping.MenuCategoryId = ?
 
         public async Task<OrderItem[]> GetOrderItemsAsync(long orderId)
             => await connection.Table<OrderItem>().Where(i => i.OrderId == orderId).ToArrayAsync();
+
+        public async Task<MenuCategory[]> GetCategoriesOfMenuItemAsync(int menuItemId)
+        {
+            var query = @"
+SELECT cat.*
+FROM MenuCategory cat
+INNER JOIN MenuItemCategoryMapping map
+ON cat.Id = map.MenuCategoryId
+WHERE map.menuItemId = ?
+";
+            var categories = await connection.QueryAsync<MenuCategory>(query, menuItemId);
+
+            return [.. categories];
+        }
+
+        public async Task<string?> SaveMenuItemAsync(MenuItemModel model)
+        {
+            if (model.Id == 0)
+            {
+                MenuItem menuItem = new()
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Icon = model.Icon,
+                    Description = model.Description,
+                    Price = model.Price
+                };
+
+                if (await connection.InsertAsync(menuItem) > 0)
+                {
+                    var categoryMapping =
+                        model
+                        .SelectedCategories
+                        .Select(c => new MenuItemCategoryMapping
+                        {
+                            Id = c.Id,
+                            MenuCategoryId = c.Id,
+                            MenuItemId = menuItem.Id
+                        });
+
+                    if (await connection.InsertAllAsync(categoryMapping) > 0)
+                    {
+                        model.Id = menuItem.Id;
+                        return null!;
+                    }
+                    else
+                    {
+                        await connection.DeleteAsync(menuItem);
+                    }
+                }
+                return "Грешка при добавяне на артикула";
+            }
+            else
+            {
+                string errorMessage = null;
+
+                await connection.RunInTransactionAsync(db =>
+                {
+                    var menuItem = db.Find<MenuItem>(model.Id);
+                    menuItem.Name = model.Name;
+                    menuItem.Description = model.Description;
+                    menuItem.Icon = model.Icon;
+                    menuItem.Price = model.Price;
+
+                    if (db.Update(menuItem) == 0)
+                    {
+                        errorMessage = "Грешка при обновяване на артикула";
+                        throw new Exception(errorMessage);
+                    }
+
+                    var deleteQuery = @"
+DELETE FROM MenuItemCategoryMapping
+WHERE MenuItemId = ?";
+                    db.Execute(deleteQuery, menuItem.Id);
+
+                    var categoryMapping =
+                        model
+                        .SelectedCategories
+                        .Select(c => new MenuItemCategoryMapping
+                        {
+                            Id = c.Id,
+                            MenuCategoryId = c.Id,
+                            MenuItemId = menuItem.Id
+                        });
+
+                    if (db.InsertAll(categoryMapping) == 0)
+                    {
+                        errorMessage = "Грешка при добавяне на категории на артикула";
+                        throw new Exception(errorMessage);
+                    }
+                });
+
+                return errorMessage;
+            }
+        }
 
         public async ValueTask DisposeAsync()
         {

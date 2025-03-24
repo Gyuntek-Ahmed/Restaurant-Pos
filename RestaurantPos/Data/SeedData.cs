@@ -8,7 +8,7 @@
             {
                 new() { Id = 1, Name = "Напитки", Icon = "drink.png" },
                 new() { Id = 2, Name = "Основно ястие", Icon = "masala_dosa.png" },
-                new() { Id = 3, Name = "Закуски", Icon = "snacks.png" },
+                new() { Id = 3, Name = "Снаксове", Icon = "snacks.png" },
                 new() { Id = 4, Name = "Десерти", Icon = "cake.png" },
                 new() { Id = 5, Name = "Бързо Хранене", Icon = "fast_food.png" },
             };

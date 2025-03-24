@@ -69,7 +69,9 @@
                   Grid.Row="1"
                   Padding="10"
                   BackgroundColor="AliceBlue">
-                <controls:SaveMenuItemFormControl />
+                <controls:SaveMenuItemFormControl Item="{Binding MenuItemModel}"
+                                                  OnCancel="SaveMenuItemFormControl_OnCancel"
+                                                  OnSaveItem="SaveMenuItemFormControl_OnSaveItem"/>
             </Grid>
               
         </Grid>
