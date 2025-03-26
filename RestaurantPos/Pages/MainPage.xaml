@@ -22,7 +22,11 @@
             RowDefinitions="Auto, Auto, *"
             RowSpacing="15"
             Padding="15">
-            <!--<Label Grid.Row="0" Text="Здравейте" FontSize="22" FontAttributes="Bold" />-->
+            <Label
+                Grid.Row="0"
+                Text="{Binding Name, StringFormat='Здравейте, {0}'}"
+                FontSize="22"
+                FontAttributes="Bold" />
 
             <controls:CategoriesListControl
                 Grid.Row="1"

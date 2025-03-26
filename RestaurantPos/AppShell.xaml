@@ -35,7 +35,12 @@
             HeightRequest="20"
             HorizontalOptions="Center"
             Source="phone_regular_24.png"
-            WidthRequest="20" />
+            WidthRequest="20">
+
+            <Image.GestureRecognizers>
+                <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
+            </Image.GestureRecognizers>
+        </Image>
     </Shell.FlyoutFooter>
 
 </Shell>

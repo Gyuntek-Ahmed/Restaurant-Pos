@@ -13,6 +13,7 @@ namespace RestaurantPos.ViewModels
     {
         private readonly DatabaseService databaseService;
         private readonly OrdersViewModel ordersViewModel;
+        private readonly SettingsViewModel settingsViewModel;
         [ObservableProperty]
         public MenuCategoryModel[] categories = [];
 
@@ -38,13 +39,20 @@ namespace RestaurantPos.ViewModels
         public decimal TaxAmount => (SubTotal * TaxPercentage) / 100;
         public decimal Total => SubTotal + TaxAmount;
 
-        public HomeViewModel(DatabaseService databaseService, OrdersViewModel ordersViewModel)
+        [ObservableProperty]
+        private string name = "Гост";
+
+        public HomeViewModel(DatabaseService databaseService, OrdersViewModel ordersViewModel, SettingsViewModel settingsViewModel)
         {
             this.databaseService = databaseService;
             this.ordersViewModel = ordersViewModel;
+            this.settingsViewModel = settingsViewModel;
             CartItems.CollectionChanged += CartItems_CollectionChanged;
 
             WeakReferenceMessenger.Default.Register<MenuItemChangeMessage>(this);
+            WeakReferenceMessenger.Default.Register<NameChangedMessage>(this, (recepient, message) => Name = message.Value);
+
+            TaxPercentage = settingsViewModel.GetTaxPercentage();
         }
 
         private void CartItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -187,6 +195,7 @@ namespace RestaurantPos.ViewModels
                 }
 
                 TaxPercentage = enteredTaxPercentage;
+                settingsViewModel.SetTaxPercentage(enteredTaxPercentage);
             }
         }
 
